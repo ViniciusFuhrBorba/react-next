@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "../../components/Button";
 import { Posts } from "../../components/Posts";
 import { TextInput } from "../../components/TextInput";
@@ -6,104 +6,66 @@ import { loadPosts } from "../../utils/load-posts";
 
 import "./styles.css";
 
-//stateful
-export class Home extends Component {
-  //state
-  state = {
-    posts: [],
-    allPosts: [],
-    page: 0,
-    postPerPage: 2,
-    searchValue: "",
-  };
+export const Home = () => {
+  const [posts, setPosts] = useState([]);
+  const [allPosts, setAllPosts] = useState([]);
+  const [page, setPage] = useState(0);
+  const [postPerPage] = useState(10);
+  const [searchValue, setSearchValue] = useState("");
 
-  async componentDidMount() {
-    await this.loadPosts();
-  }
+  const noMorePosts = page + postPerPage >= allPosts.length;
 
-  loadPosts = async () => {
-    const { page, postPerPage } = this.state;
+  const filteredPosts = !!searchValue
+    ? allPosts.filter((post) => {
+        return post.title.toLowerCase().includes(searchValue.toLowerCase());
+      })
+    : posts;
+
+  const handleLoadPosts = useCallback(async (page, postPerPage) => {
     const postsAndPhotos = await loadPosts();
-    this.setState({
-      posts: postsAndPhotos.slice(page, postPerPage),
-      allPosts: postsAndPhotos,
-    });
-  };
 
-  loadMorePosts = () => {
-    const { page, postPerPage, allPosts, posts } = this.state;
+    setPosts(postsAndPhotos.slice(page, postPerPage));
+    setAllPosts(postsAndPhotos);
+  }, []);
 
+  useEffect(() => {
+    handleLoadPosts(0, postPerPage);
+  }, [handleLoadPosts, postPerPage]);
+
+  const loadMorePosts = () => {
     const nextPage = page + postPerPage;
     const nextPosts = allPosts.slice(nextPage, nextPage + postPerPage);
     posts.push(...nextPosts);
 
-    this.setState({ posts, page: nextPage });
+    setPosts(posts);
+    setPage(nextPage);
   };
 
-  handleChangeText = (e) => {
+  const handleChangeText = (e) => {
     const { value } = e.target;
-    this.setState({ searchValue: value });
+    setSearchValue(value);
   };
 
-  //atualiza o componente
-  // componentDidUpdate() {}
-
-  //limpa o componente quando ele é "desmontado"
-  // componentWillUnmount() {}
-
-  render() {
-    const { posts, page, postPerPage, allPosts, searchValue } = this.state;
-    const noMorePosts = page + postPerPage >= allPosts.length;
-
-    const filteredPosts = !!searchValue
-      ? allPosts.filter((post) => {
-          return post.title.toLowerCase().includes(searchValue.toLowerCase());
-        })
-      : posts;
-
-    return (
-      <section className="container">
-        <div className="search-container">
-          {!!searchValue && <h1>Search value: {searchValue}</h1>}
-          <TextInput
-            searchValue={searchValue}
-            handleChangeText={this.handleChangeText}
+  return (
+    <section className="container">
+      <div className="search-container">
+        {!!searchValue && <h1>Search value: {searchValue}</h1>}
+        <TextInput
+          searchValue={searchValue}
+          handleChangeText={handleChangeText}
+        />
+      </div>
+      {filteredPosts.length > 0 && <Posts posts={filteredPosts} />}
+      {filteredPosts.length === 0 && <p>Não existem posts =(</p>}
+      {!searchValue && (
+        <div className="button-container">
+          <Button
+            text="Load More Posts"
+            onClick={loadMorePosts}
+            disabled={noMorePosts}
           />
         </div>
-        {filteredPosts.length > 0 && <Posts posts={filteredPosts} />}
-        {filteredPosts.length === 0 && <p>Não existem posts =(</p>}
-        {!searchValue && (
-          <div className="button-container">
-            <Button
-              text="Load More Posts"
-              onClick={this.loadMorePosts}
-              disabled={noMorePosts}
-            />
-          </div>
-        )}
-      </section>
-    );
-  }
-}
-
-//stateless component function
-// function Home() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code> src / App.js </code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
+      )}
+    </section>
+  );
+};
