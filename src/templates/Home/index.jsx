@@ -1,21 +1,21 @@
-import { useEffect, useState, useCallback } from "react";
-import { Button } from "../../components/Button";
-import { Posts } from "../../components/Posts";
-import { TextInput } from "../../components/TextInput";
-import { loadPosts } from "../../utils/load-posts";
+import { useEffect, useState, useCallback } from 'react';
+import { Button } from '../../components/Button';
+import { Posts } from '../../components/Posts';
+import { TextInput } from '../../components/TextInput';
+import { loadPosts } from '../../utils/load-posts';
 
-import "./styles.css";
+import './styles.css';
 
 export const Home = () => {
   const [posts, setPosts] = useState([]);
   const [allPosts, setAllPosts] = useState([]);
   const [page, setPage] = useState(0);
   const [postPerPage] = useState(10);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
 
   const noMorePosts = page + postPerPage >= allPosts.length;
 
-  const filteredPosts = !!searchValue
+  const filteredPosts = searchValue
     ? allPosts.filter((post) => {
         return post.title.toLowerCase().includes(searchValue.toLowerCase());
       })
@@ -50,20 +50,13 @@ export const Home = () => {
     <section className="container">
       <div className="search-container">
         {!!searchValue && <h1>Search value: {searchValue}</h1>}
-        <TextInput
-          searchValue={searchValue}
-          handleChangeText={handleChangeText}
-        />
+        <TextInput searchValue={searchValue} handleChangeText={handleChangeText} />
       </div>
       {filteredPosts.length > 0 && <Posts posts={filteredPosts} />}
       {filteredPosts.length === 0 && <p>Não existem posts =(</p>}
       {!searchValue && (
         <div className="button-container">
-          <Button
-            text="Load More Posts"
-            onClick={loadMorePosts}
-            disabled={noMorePosts}
-          />
+          <Button text="Load More Posts" onClick={loadMorePosts} disabled={noMorePosts} />
         </div>
       )}
     </section>
