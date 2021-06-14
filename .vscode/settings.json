@@ -8,12 +8,9 @@
   "window.menuBarVisibility": "show",
   "workbench.list.smoothScrolling": true,
   "workbench.colorTheme": "OM Theme (Night Owl Italic)",
-  "workbench.editorAssociations": [
-    {
-      "viewType": "jupyter.notebook.ipynb",
-      "filenamePattern": "*.ipynb"
-    }
-  ],
+  "workbench.editorAssociations": {
+    "*.ipynb": "jupyter.notebook.ipynb"
+  },
 
   // Explorer
   "explorer.compactFolders": false,
