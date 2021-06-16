@@ -1,5 +1,9 @@
+import { render, screen } from '@testing-library/react';
+import { Home } from '.';
+
 describe('<Home/>', () => {
-  it('is a dummy test', () => {
-    expect(1).toBe(1);
+  it('should render search, posts and load more', () => {
+    render(<Home />);
+    screen.debug();
   });
 });
